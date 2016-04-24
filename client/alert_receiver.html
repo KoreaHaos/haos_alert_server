@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" ng-app>
+  <head>
+    <title>Alert Receiver</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-responsive.min.css">
+    <style>
+      body {
+        padding-top: 60px;
+      }
+    </style>
+    
+    <script>
+      function AlertReceiver($scope) {
+        var socket = io.connect();
+
+        $scope.messages = [];
+        $scope.roster = [];
+        $scope.name = 'Receiver';
+        $scope.text = '';
+        $scope.alert = false;
+
+        socket.on('connect', function () {
+          $scope.setName();
+        });
+
+        socket.on('message', function (msg) {
+          
+          if ((msg.text === "ALERT!") && (!$scope.alert)) {
+            $scope.alert = true;
+            console.log("ALERT on!!");
+            $scope.set_background_color();
+          } else if (msg.text === "ALERT!"){
+            console.log("msg = " + msg);
+            console.log("alert OFF!!");
+            $scope.alert = false;
+            $scope.set_background_color();
+          } else if (msg.text === "CLEAR") {
+            console.log("Clearing Messages.");
+            $scope.messages=[];
+          }
+
+          //$scope.messages.push(msg);
+          $scope.$apply();
+          console.log("$scope.alert = " + $scope.alert);
+        });
+
+        socket.on('roster', function (names) {
+          $scope.roster = names;
+          $scope.$apply();
+        });
+
+        $scope.send = function send() {
+          console.log('Sending message:', $scope.text);
+          socket.emit('message', $scope.text);
+          $scope.text = '';
+        };
+        
+        $scope.clear_messages = function send() {
+          var alert_message="CLEAR";
+          console.log('Sending Alert:', alert_message);
+          socket.emit('message', alert_message);
+        };
+
+        $scope.setName = function setName() {
+          socket.emit('identify', $scope.name);
+        };
+        
+        $scope.set_background_color = function set_background_color() {
+          
+          if ($scope.alert) {
+            document.body.style.backgroundColor = "red";
+            console.log("$scope.alert = " + $scope.alert)
+          } else {
+            document.body.style.backgroundColor = "green";
+            console.log("$scope.alert = " + $scope.alert)
+          }
+          
+          var r = confirm("Press a button!");
+          if (r == true) {
+            $scope.text = "Reciever recieved the alert and clicked OK!!";
+            $scope.send();
+          } else {
+            $scope.text = "Reciever recieved alert and clicked CANCEL!";
+            $scope.send();
+          }
+          
+        }
+      }
+    </script>
+  
+  </head>
+  <body>
+    <div class="container" ng-controller="AlertReceiver">
+      <div class="row">
+        <div class="span3">
+          <ul class="nav nav-list well">
+            <li class="nav-header">Local Users</li>
+            <li ng-repeat="user in roster" ng-bind="user">
+            </li>
+          </ul>
+        </div>
+        <div class="span9">
+          <div class="row controls">
+                <button class="span2 btn btn-primary" type="button" ng-click="clear_messages()">CLEAR</button>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/angular.min.js"></script>
+  </body>
+</html>

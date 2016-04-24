@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" ng-app>
+  <head>
+    <title>Alert Sender</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-responsive.min.css">
+    <style>
+      body {
+        padding-top: 60px;
+      }
+    </style>
+    
+    <script>
+      function AlertSender($scope) {
+
+        var socket = io.connect();
+
+        $scope.messages = [];
+        $scope.roster = [];
+        $scope.name = 'Sender';
+        $scope.text = '';
+        $scope.alert_status= false;
+
+        socket.on('connect', function () {
+          $scope.setName();
+        });
+
+        socket.on('message', function (msg) {
+          //$scope.messages.push(msg);
+          //$scope.$apply();
+        });
+
+        socket.on('roster', function (names) {
+          //$scope.roster = names;
+          //$scope.$apply();
+        });
+
+        $scope.send = function send() {
+          //console.log('Sending message:', $scope.text);
+          //socket.emit('message', $scope.text);
+          //$scope.text = '';
+        };
+        
+        $scope.send_alert = function send() {
+          var alert_message="ALERT!";
+          console.log('Sending Alert:', alert_message);
+          socket.emit('message', alert_message);
+          
+        };
+
+        $scope.setName = function setName() {
+          socket.emit('identify', $scope.name);
+        };
+      }
+    </script>
+  
+  </head>
+  <body>
+    <div class="container" ng-controller="AlertSender">
+        <div class="span9">
+          <div class="row controls">
+                <button type="button" class="span2 btn btn-primary" ng-click="send_alert()">ALERT!</button>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/angular.min.js"></script>
+  </body>
+</html>
