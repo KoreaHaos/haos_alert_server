@@ -85,7 +85,7 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
   
   console.log("Chat server listening at", addr.address + ":" + addr.port);
   
-  console.log("IN YOUR BROWSER :);
+  console.log("IN YOUR BROWSER :");
   console.log("Reciever : https://" + process.env.C9_HOSTNAME + "/alert_receiver.html");
   console.log("Sender   : https://" + process.env.C9_HOSTNAME + "/alert_sender.html");
   console.log("Monitor  : https://" + process.env.C9_HOSTNAME + "/alert_monitor.html");
